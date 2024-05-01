@@ -130,6 +130,7 @@ impl RenetServer {
     /// </p>
     pub fn remove_connection(&mut self, client_id: ClientId) {
         if let Some(connection) = self.connections.remove(&client_id) {
+            eprintln!("remove_connection: {} {:?}", client_id, connection.disconnect_reason());
             let reason = connection.disconnect_reason().unwrap_or(DisconnectReason::Transport);
             self.events.push_back(ServerEvent::ClientDisconnected { client_id, reason });
         }

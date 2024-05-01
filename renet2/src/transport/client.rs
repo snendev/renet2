@@ -105,6 +105,7 @@ impl NetcodeClientTransport {
     pub fn update(&mut self, duration: Duration, client: &mut RenetClient) -> Result<(), NetcodeTransportError> {
         if let Some(reason) = self.netcode_client.disconnect_reason() {
             // Mark the client as disconnected if an error occured in the transport layer
+            eprintln!("update disconnect: {}", reason);
             client.disconnect_due_to_transport();
             self.socket.close();
 
@@ -112,6 +113,7 @@ impl NetcodeClientTransport {
         }
 
         if self.socket.is_closed() {
+            eprintln!("update disconnect: socket is closed");
             client.disconnect_due_to_transport();
         }
 
