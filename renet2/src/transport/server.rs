@@ -228,6 +228,7 @@ fn send_packet_to_client(
         Ok(()) => true,
         Err(NetcodeTransportError::IO(ref e)) if e.kind() == io::ErrorKind::ConnectionAborted => {
             // Manually disconnect the client if the client's address is disconnected.
+            eprintln!("caller: send_packet_to_client; {:?}", e);
             reliable_server.remove_connection(client_id);
             // Ignore the server result since this client is not connected.
             let _ = netcode_server.disconnect(client_id.raw());
@@ -293,6 +294,7 @@ fn handle_server_result(server_result: ServerResult, sockets: &mut [Box<dyn Tran
             payload,
             socket_id,
         } => {
+            eprintln!("caller: handle_server_result; {:?} - {:?}", addr, socket_id);
             reliable_server.remove_connection(ClientId::from_raw(client_id));
             if let Some(payload) = payload {
                 send_packet(sockets, payload, socket_id, addr);
