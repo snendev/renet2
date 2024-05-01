@@ -667,7 +667,7 @@ impl TransportSocket for WebTransportServer {
                 pending_client.set_buffer(packet);
                 return Ok(());
             }
-
+            eprintln!("WTServer send aborted: client not found");
             return Err(std::io::Error::from(ErrorKind::ConnectionAborted).into());
         };
 
@@ -677,6 +677,7 @@ impl TransportSocket for WebTransportServer {
             match err.get_error_level() {
                 ErrorLevel::ConnectionError => {
                     self.disconnect(addr);
+                    eprintln!("WTServer send aborted: send datagram failed");
                     return Err(std::io::Error::from(ErrorKind::ConnectionAborted).into());
                 }
                 ErrorLevel::StreamError => debug!("Stream error: {err}"),

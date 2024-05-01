@@ -359,6 +359,7 @@ impl TransportSocket for WebTransportClient {
 
     fn try_recv(&mut self, buffer: &mut [u8]) -> std::io::Result<(usize, SocketAddr)> {
         if self.is_closed() {
+            eprintln!("try_recv aborted");
             return Err(std::io::Error::from(ErrorKind::ConnectionAborted));
         }
 
@@ -380,6 +381,7 @@ impl TransportSocket for WebTransportClient {
     // This method will panic if not called on the main thread, which is not a problem for WASM which is single-threaded.
     fn send(&mut self, addr: SocketAddr, packet: &[u8]) -> Result<(), NetcodeTransportError> {
         if self.is_closed() {
+            eprintln!("send aborted");
             return Err(std::io::Error::from(ErrorKind::ConnectionAborted).into());
         }
         if addr != self.server_address() {
