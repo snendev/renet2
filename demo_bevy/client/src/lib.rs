@@ -115,7 +115,7 @@ fn add_webtransport_network(app: &mut App) {
     //
     let server_addr = wt_socket_addr();
     // >>>>>>>>>>> INSERT SERVER CERT HASH HERE <<<<<<<<<<<
-    let server_cert_hash_b64 = "sQMkRdBGFypjga8araFrt3D7dTThtFppmHRxILyuUYc=";
+    let server_cert_hash_b64 = "TRVIbS/EZTtIvo8f4H1p+r4qEJgt65r6X3nP2YKfjS0=";
     let hash = base64::engine::general_purpose::STANDARD.decode(server_cert_hash_b64).unwrap();
 
     let client = RenetClient::new(connection_config());
@@ -123,7 +123,7 @@ fn add_webtransport_network(app: &mut App) {
     let client_id = current_time.as_millis() as u64;
     let client_auth = ClientAuthentication::Unsecure {
         client_id,
-        protocol_id: 0, // PROTOCOL_ID ?
+        protocol_id: PROTOCOL_ID,
         socket_id: 0,
         server_addr,
         user_data: None,

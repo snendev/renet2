@@ -1,5 +1,8 @@
 use base64::Engine;
-use renet2::{transport::{CongestionControl, NetcodeClientTransport, ServerCertHash, WebTransportClient, WebTransportClientConfig}, ConnectionConfig, DefaultChannel, RenetClient};
+use renet2::{
+    transport::{CongestionControl, NetcodeClientTransport, ServerCertHash, WebTransportClient, WebTransportClientConfig},
+    ConnectionConfig, DefaultChannel, RenetClient,
+};
 use renetcode2::ClientAuthentication;
 use std::time::Duration;
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
@@ -21,7 +24,7 @@ impl ChatApplication {
 
         let server_addr = "127.0.0.1:4434".parse().unwrap();
         // >>>>>>>>>>> INSERT SERVER CERT HASH HERE <<<<<<<<<<<
-        let server_cert_hash_b64 = "Rii+iLFgubepB2M3I42twNirxfURJVKHJNegpsk4KFM=";
+        let server_cert_hash_b64 = "sQMkRdBGFypjga8araFrt3D7dTThtFppmHRxILyuUYc=";
         let hash = base64::engine::general_purpose::STANDARD.decode(server_cert_hash_b64).unwrap();
 
         let connection_config = ConnectionConfig::default();
@@ -30,11 +33,11 @@ impl ChatApplication {
         let client_auth = ClientAuthentication::Unsecure {
             client_id: current_time.as_millis() as u64,
             protocol_id: 0,
-            socket_id: 1,  //Webtransport socket id is 1 in this example
+            socket_id: 1, //Webtransport socket id is 1 in this example
             server_addr,
             user_data: None,
         };
-        let socket_config = WebTransportClientConfig{
+        let socket_config = WebTransportClientConfig {
             server_addr,
             congestion_control: CongestionControl::default(),
             server_cert_hashes: Vec::from([ServerCertHash::try_from(hash).unwrap()]),

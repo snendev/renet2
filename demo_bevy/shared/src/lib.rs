@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, time::Duration};
+use std::{f32::consts::PI, net::SocketAddr, time::Duration};
 
 use bevy::prelude::*;
 use bevy_renet2::renet2::{ChannelConfig, ClientId, ConnectionConfig, SendType};
@@ -8,6 +8,14 @@ use serde::{Deserialize, Serialize};
 pub const PRIVATE_KEY: &[u8; bevy_renet2::renet2::transport::NETCODE_KEY_BYTES] = b"an example very very secret key."; // 32-bytes
 #[cfg(feature = "transport")]
 pub const PROTOCOL_ID: u64 = 7;
+
+pub fn native_socket_addr() -> SocketAddr {
+    "127.0.0.1:4433".parse().unwrap()
+}
+
+pub fn wt_socket_addr() -> SocketAddr {
+    "127.0.0.1:4434".parse().unwrap()
+}
 
 #[derive(Debug, Component)]
 pub struct Player {

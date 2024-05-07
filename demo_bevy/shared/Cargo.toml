@@ -1,25 +1,14 @@
 [package]
-name = "demo_bevy"
+name = "demo_bevy_shared"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[[bin]]
-name = "server"
-path = "src/bin/server.rs"
-
-[[bin]]
-name = "client"
-path = "src/bin/client.rs"
-
 [features]
 default = ["transport"]
 transport = ["bevy_renet2/transport"]
-wt_server = ["bevy_renet2/wt_server"]
-wt_client = ["bevy_renet2/wt_client"]
-steam = ["dep:renet2_steam", "steamworks"]
 
 [dependencies]
 bevy = { version = "0.13", default-features = false, features = [
@@ -32,14 +21,14 @@ bevy = { version = "0.13", default-features = false, features = [
     "ktx2",
     "zstd",
 ] }
-bevy_renet2 = { path = "../bevy_renet2", features = ["serde"] }
-renet2_steam = { path = "../renet2_steam", features = [
+bevy_renet2 = { path = "../../bevy_renet2", features = ["serde"] }
+renet2_steam = { path = "../../renet2_steam", features = [
     "bevy",
 ], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 bincode = "1.3"
 bevy_egui = "0.25"
-renet2_visualizer = { path = "../renet2_visualizer", features = ["bevy"] }
+renet2_visualizer = { path = "../../renet2_visualizer", features = ["bevy"] }
 smooth-bevy-cameras = "0.11"
 fastrand = "2.0"
 steamworks = { version = "0.11", optional = true }

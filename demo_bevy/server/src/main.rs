@@ -9,7 +9,7 @@ use bevy_renet2::{
     renet2::{ClientId, RenetServer, ServerEvent},
     RenetServerPlugin,
 };
-use demo_bevy::{
+use demo_bevy_shared::{
     setup_level, spawn_fireball, ClientChannel, NetworkedEntities, Player, PlayerCommand, PlayerInput, Projectile, ServerChannel,
     ServerMessages, Velocity,
 };
@@ -30,18 +30,56 @@ struct Bot {
 #[derive(Debug, Resource)]
 struct BotId(u64);
 
+#[cfg(feature = "webtransport")]
+fn add_webtransport_network(app: &mut App) {
+    use base64::Engine;
+    use bevy_renet2::{
+        renet2::transport::{
+            NetcodeServerTransport, ServerAuthentication, ServerSetupConfig, WebTransportServer, WebTransportServerConfig,
+        },
+        transport::NetcodeServerPlugin,
+    };
+    use demo_bevy_shared::{connection_config, wt_socket_addr, PROTOCOL_ID};
+    use std::time::SystemTime;
+
+    let public_addr = wt_socket_addr();
+    let wt_socket = {
+        let (transport_config, cert_hash) = WebTransportServerConfig::new_selfsigned(public_addr, 10);
+        let cert_hash_b64 = base64::engine::general_purpose::STANDARD.encode(cert_hash.hash.as_ref());
+        info!("WT SERVER CERT HASH (PASTE ME TO CLIENTS): {:?}", cert_hash_b64);
+        WebTransportServer::new(transport_config, tokio::runtime::Handle::try_current().unwrap()).unwrap()
+    };
+
+    app.add_plugins(NetcodeServerPlugin);
+
+    let server = RenetServer::new(connection_config());
+
+    let current_time: std::time::Duration = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
+    let server_config = ServerSetupConfig {
+        current_time,
+        max_clients: 64,
+        protocol_id: PROTOCOL_ID,
+        socket_addresses: vec![vec![public_addr]],
+        authentication: ServerAuthentication::Unsecure,
+    };
+
+    let transport = NetcodeServerTransport::new(server_config, wt_socket).unwrap();
+    app.insert_resource(server);
+    app.insert_resource(transport);
+}
+
 #[cfg(feature = "transport")]
 fn add_netcode_network(app: &mut App) {
     use bevy_renet2::renet2::transport::{NativeSocket, NetcodeServerTransport, ServerAuthentication, ServerSetupConfig};
     use bevy_renet2::transport::NetcodeServerPlugin;
-    use demo_bevy::{connection_config, PROTOCOL_ID};
+    use demo_bevy_shared::{connection_config, native_socket_addr, PROTOCOL_ID};
     use std::{net::UdpSocket, time::SystemTime};
 
     app.add_plugins(NetcodeServerPlugin);
 
     let server = RenetServer::new(connection_config());
 
-    let public_addr = "127.0.0.1:5000".parse().unwrap();
+    let public_addr = native_socket_addr();
     let socket = UdpSocket::bind(public_addr).unwrap();
     let current_time: std::time::Duration = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
     let server_config = ServerSetupConfig {
@@ -86,7 +124,8 @@ fn add_steam_network(app: &mut App) {
     app.add_systems(PreUpdate, steam_callbacks);
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut app = App::new();
     app.add_plugins(DefaultPlugins);
 
@@ -99,6 +138,9 @@ fn main() {
     app.insert_resource(BotId(0));
 
     app.insert_resource(RenetServerVisualizer::<200>::default());
+
+    #[cfg(feature = "webtransport")]
+    add_webtransport_network(&mut app);
 
     #[cfg(feature = "transport")]
     add_netcode_network(&mut app);

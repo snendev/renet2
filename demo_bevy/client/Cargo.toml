@@ -30,16 +30,7 @@ webtransport = [
 
 [dependencies]
 demo_bevy_shared = { path = "../shared" }
-bevy = { version = "0.13", default-features = false, features = [
-    "bevy_core_pipeline",
-    "bevy_render",
-    "bevy_asset",
-    "bevy_pbr",
-    "x11",
-    "tonemapping_luts",
-    "ktx2",
-    "zstd",
-] }
+bevy = { version = "0.13" }
 bevy_renet2 = { path = "../../bevy_renet2", features = ["serde"] }
 renet2_steam = { path = "../../renet2_steam", features = [
     "bevy",
