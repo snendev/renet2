@@ -2,6 +2,7 @@ use std::{collections::HashMap, f32::consts::PI};
 
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    log::LogPlugin,
     prelude::*,
 };
 use bevy_egui::{EguiContexts, EguiPlugin};
@@ -46,7 +47,7 @@ fn add_webtransport_network(app: &mut App) {
     let wt_socket = {
         let (transport_config, cert_hash) = WebTransportServerConfig::new_selfsigned(public_addr, 10);
         let cert_hash_b64 = base64::engine::general_purpose::STANDARD.encode(cert_hash.hash.as_ref());
-        info!("WT SERVER CERT HASH (PASTE ME TO CLIENTS): {:?}", cert_hash_b64);
+        println!("WT SERVER CERT HASH (PASTE ME TO CLIENTS): {:?}", cert_hash_b64);
         WebTransportServer::new(transport_config, tokio::runtime::Handle::try_current().unwrap()).unwrap()
     };
 
@@ -127,7 +128,7 @@ fn add_steam_network(app: &mut App) {
 #[tokio::main]
 async fn main() {
     let mut app = App::new();
-    app.add_plugins(DefaultPlugins);
+    app.add_plugins(DefaultPlugins.build().disable::<LogPlugin>());
 
     app.add_plugins(RenetServerPlugin);
     app.add_plugins(FrameTimeDiagnosticsPlugin);
